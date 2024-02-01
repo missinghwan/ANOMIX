@@ -22,7 +22,7 @@ A PyTorch implementation of "[Graph Anomaly Detection via Multi-Level Contrastiv
 # Usage
 All of datasets used in this paper are put in ./dataset folder and graph information (e.g., adjacency, attribute, and label) is included in each dataset file (.mat). Due to the large file size, some of metapaths are included in that folder as .csv files.
 
-    python main.py --dataset cora
+    python run.py --dataset cora
 
 
 # Contact
