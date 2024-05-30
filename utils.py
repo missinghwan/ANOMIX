@@ -8,9 +8,6 @@ import random
 import dgl
 import pandas as pd
 
-###############################################
-# Forked from GRAND-Lab/CoLA                  #
-###############################################
 
 def parse_skipgram(fname):
     with open(fname) as f:
@@ -27,6 +24,7 @@ def parse_skipgram(fname):
             ret[cur_nd][j] = cur_ft
             it += 1
     return ret
+
 
 # Process a (subset of) a TU dataset into standard form
 def process_tu(data, nb_nodes):
@@ -50,6 +48,7 @@ def process_tu(data, nb_nodes):
 
     return features, adjacency, labels, sizes, masks
 
+
 def micro_f1(logits, labels):
     # Compute predictions
     preds = torch.round(nn.Sigmoid()(logits))
@@ -70,12 +69,7 @@ def micro_f1(logits, labels):
     f1 = (2 * prec * rec) / (prec + rec)
     return f1
 
-"""
- Prepare adjacency matrix by expanding up to a given neighbourhood.
- This will insert loops on every node.
- Finally, the matrix is converted to bias vectors.
- Expected shape: [graph, nodes, nodes]
-"""
+
 def adj_to_bias(adj, sizes, nhood=1):
     nb_graphs = adj.shape[0]
     mt = np.empty(adj.shape)
@@ -90,10 +84,6 @@ def adj_to_bias(adj, sizes, nhood=1):
     return -1e9 * (1.0 - mt)
 
 
-###############################################
-# Forked from tkipf/gcn                       #
-###############################################
-
 def parse_index_file(filename):
     """Parse index file."""
     index = []
@@ -101,11 +91,13 @@ def parse_index_file(filename):
         index.append(int(line.strip()))
     return index
 
+
 def sample_mask(idx, l):
     """Create mask."""
     mask = np.zeros(l)
     mask[idx] = 1
     return np.array(mask, dtype=np.bool)
+
 
 def sparse_to_tuple(sparse_mx, insert_batch=False):
     """Convert sparse matrix to tuple representation."""
@@ -131,6 +123,7 @@ def sparse_to_tuple(sparse_mx, insert_batch=False):
 
     return sparse_mx
 
+
 def standardize_data(f, train_mask):
     """Standardize feature matrix and convert to tuple representation"""
     # standardize data
@@ -143,6 +136,7 @@ def standardize_data(f, train_mask):
     f = (f - mu) / sigma
     return f
 
+
 def preprocess_features(features):
     """Row-normalize feature matrix and convert to tuple representation"""
     rowsum = np.array(features.sum(1))
@@ -151,6 +145,7 @@ def preprocess_features(features):
     r_mat_inv = sp.diags(r_inv)
     features = r_mat_inv.dot(features)
     return features.todense(), sparse_to_tuple(features)
+
 
 def normalize_adj(adj):
     """Symmetrically normalize adjacency matrix."""
@@ -167,6 +162,7 @@ def preprocess_adj(adj):
     adj_normalized = normalize_adj(adj + sp.eye(adj.shape[0]))
     return sparse_to_tuple(adj_normalized)
 
+
 def sparse_mx_to_torch_sparse_tensor(sparse_mx):
     """Convert a scipy sparse matrix to a torch sparse tensor."""
     sparse_mx = sparse_mx.tocoo().astype(np.float32)
@@ -175,6 +171,7 @@ def sparse_mx_to_torch_sparse_tensor(sparse_mx):
     values = torch.from_numpy(sparse_mx.data)
     shape = torch.Size(sparse_mx.shape)
     return torch.sparse.FloatTensor(indices, values, shape)
+
 
 def adj_to_dict(adj,hop=1,min_len=8):
     adj = np.array(adj.todense(),dtype=np.float64)
@@ -185,7 +182,6 @@ def adj_to_dict(adj,hop=1,min_len=8):
     if hop > 1:
         for _ in range(hop - 1):
             adj_diff = adj_diff.dot(adj)
-
 
     dict = {}
     for i in range(num_node):
@@ -200,6 +196,7 @@ def adj_to_dict(adj,hop=1,min_len=8):
         while len(final_dict[i]) < min_len:
             final_dict[i].append(random.choice(dict[random.choice(dict[i])]))
     return dict
+
 
 def dense_to_one_hot(labels_dense, num_classes):
     """Convert class labels from scalars to one-hot vectors."""

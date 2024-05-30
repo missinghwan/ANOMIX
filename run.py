@@ -1,5 +1,4 @@
 import torch
-
 from model import Model
 from utils import *
 from sklearn.metrics import roc_auc_score, roc_curve
@@ -13,7 +12,7 @@ import pandas as pd
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 os.environ['OMP_NUM_THREADS'] = '1'
 
-parser = argparse.ArgumentParser(description='Hard-GCL')
+parser = argparse.ArgumentParser(description='ANOMIX')
 parser.add_argument('--expid', type=int)
 parser.add_argument('--device', type=str, default='cuda:0')
 parser.add_argument('--dataset', type=str, default='cora')
@@ -31,6 +30,7 @@ parser.add_argument('--negsamp_ratio_patch', type=int, default=1)
 parser.add_argument('--negsamp_ratio_context', type=int, default=1)
 parser.add_argument('--alpha', type=float, default=0.6, help='how much level info involves ')
 parser.add_argument('--beta', type=float, default=0.6, help='how much abnormality involves ')
+parser.add_argument('--ratio', type=int, default=10, help='anomaly ratio ')
 args = parser.parse_args()
 
 if __name__ == '__main__':

@@ -2,10 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class GCN(nn.Module):
-    """
-    Forked from GRAND-Lab/CoLA
-    """
     def __init__(self, in_ft, out_ft, act, bias=True):
         super(GCN, self).__init__()
         self.fc = nn.Linear(in_ft, out_ft, bias=False)
@@ -38,9 +36,6 @@ class GCN(nn.Module):
         return self.act(out)
 
 class AvgReadout(nn.Module):
-    """
-    Forked from GRAND-Lab/CoLA
-    """
     def __init__(self):
         super(AvgReadout, self).__init__()
 
@@ -48,9 +43,6 @@ class AvgReadout(nn.Module):
         return torch.mean(seq, 1)
 
 class MaxReadout(nn.Module):
-    """
-    Forked from GRAND-Lab/CoLA
-    """
     def __init__(self):
         super(MaxReadout, self).__init__()
 
@@ -58,9 +50,6 @@ class MaxReadout(nn.Module):
         return torch.max(seq,1).values
 
 class MinReadout(nn.Module):
-    """
-    Forked from GRAND-Lab/CoLA
-    """
     def __init__(self):
         super(MinReadout, self).__init__()
 
@@ -68,9 +57,6 @@ class MinReadout(nn.Module):
         return torch.min(seq, 1).values
 
 class WSReadout(nn.Module):
-    """
-    Forked from GRAND-Lab/CoLA
-    """
     def __init__(self):
         super(WSReadout, self).__init__()
 
@@ -82,6 +68,7 @@ class WSReadout(nn.Module):
         out = torch.mul(seq,sim)
         out = torch.sum(out,1)
         return out
+
 
 class Contextual_Discriminator(nn.Module):
     def __init__(self, n_h, negsamp_round):
@@ -107,6 +94,7 @@ class Contextual_Discriminator(nn.Module):
         logits = torch.cat(tuple(scs))
         return logits
 
+
 class Patch_Discriminator(nn.Module):
     def __init__(self, n_h, negsamp_round):
         super(Patch_Discriminator, self).__init__()
@@ -130,6 +118,7 @@ class Patch_Discriminator(nn.Module):
             scs.append(self.f_k(h_unano, h_mi))
         logits = torch.cat(tuple(scs))
         return logits
+
 
 class Model(nn.Module):
     def __init__(self, n_in, n_h, activation, negsamp_round_patch, negsamp_round_context, readout):
