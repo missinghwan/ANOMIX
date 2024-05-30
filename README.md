@@ -1,9 +1,9 @@
-# MSAD
-A PyTorch implementation of "[Graph Anomaly Detection via Multi-Level Contrastive Learning with Hard Negative Samples]" (HGCL)
+# ANOMIX
+A PyTorch implementation of "[ANOMIX: A Simple yet Effective Graph Mixing Approach for GAD]"
 
 
 # Dependencies
-  Dependencies for all experiments of MSAD are as follows:
+  Dependencies for all experiments of ANOMIX are as follows:
   
    • Python == 3.7.8
    
@@ -24,6 +24,3 @@ All of datasets used in this paper are put in ./dataset folder and graph informa
 
     python run.py --dataset cora
 
-
-# Contact
-missinghwan@gmail.com
