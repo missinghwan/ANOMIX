@@ -20,7 +20,7 @@ A PyTorch implementation of "[ANOMIX: A Simple yet Effective Graph Mixing Approa
    • DGL == 0.4.1
 
 # Usage
-All of datasets used in this paper are put in ./dataset folder and graph information (e.g., adjacency, attribute, and label) is included in each dataset file (.mat). Due to the large file size, some of metapaths are included in that folder as .csv files.
+All of datasets used in this paper are put in ./dataset folder and graph information (e.g., adjacency, attribute, and label) is included in each dataset file (.mat). 
 
     python run.py --dataset cora
 
