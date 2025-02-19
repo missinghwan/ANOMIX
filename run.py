@@ -15,22 +15,22 @@ os.environ['OMP_NUM_THREADS'] = '1'
 parser = argparse.ArgumentParser(description='ANOMIX')
 parser.add_argument('--expid', type=int)
 parser.add_argument('--device', type=str, default='cuda:0')
-parser.add_argument('--dataset', type=str, default='cora')
-parser.add_argument('--lr', type=float, default=5e-4)
+parser.add_argument('--dataset', type=str, default='ACM')
+parser.add_argument('--lr', type=float, default=1e-3)
 parser.add_argument('--weight_decay', type=float, default=0.0)
-parser.add_argument('--runs', type=int, default=1)
+parser.add_argument('--runs', type=int, default=10)
 parser.add_argument('--embedding_dim', type=int, default=64)
 parser.add_argument('--patience', type=int, default=100)
-parser.add_argument('--num_epoch', type=int, default=50)
-parser.add_argument('--batch_size', type=int, default=1000) # cora:1000, citeseer:1110, pubmed:19718,
-parser.add_argument('--subgraph_size', type=int, default=4)
+parser.add_argument('--num_epoch', type=int, default=200)
+parser.add_argument('--batch_size', type=int, default=100000) # cora:1000, citeseer:1110, pubmed:19718,
+parser.add_argument('--subgraph_size', type=int, default=3)
 parser.add_argument('--readout', type=str, default='avg')
-parser.add_argument('--auc_test_rounds', type=int, default=50)
-parser.add_argument('--negsamp_ratio_patch', type=int, default=1)
+parser.add_argument('--auc_test_rounds', type=int, default=128)
+parser.add_argument('--negsamp_ratio_patch', type=int, default=3)
 parser.add_argument('--negsamp_ratio_context', type=int, default=1)
-parser.add_argument('--alpha', type=float, default=0.6, help='how much level info involves ')
-parser.add_argument('--beta', type=float, default=0.6, help='how much abnormality involves ')
-parser.add_argument('--ratio', type=int, default=10, help='anomaly ratio ')
+parser.add_argument('--alpha', type=float, default=0.6, help='how much level info involves')
+parser.add_argument('--beta', type=float, default=0.6, help='how much abnormality involves')
+parser.add_argument('--ratio', type=int, default=10, help='anomaly ratio')
 args = parser.parse_args()
 
 if __name__ == '__main__':
@@ -39,6 +39,7 @@ if __name__ == '__main__':
     print('alpha: {}'.format(args.alpha))
     print('beta: {}'.format(args.beta))
     device = torch.device(args.device if torch.cuda.is_available() else 'cpu')
+    print('Device: {}'.format(device))
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
@@ -47,22 +48,23 @@ if __name__ == '__main__':
     batch_size = args.batch_size
     subgraph_size = args.subgraph_size
 
-    adj, features, labels, idx_train, idx_val,\
+    adj, features, label, idx_train, idx_val,\
     idx_test, ano_label, str_ano_label, attr_ano_label = load_mat(args.dataset)
 
     features, _ = preprocess_features(features)
     dgl_graph = adj_to_dgl_graph(adj)
+    nx_graph = nx.from_scipy_sparse_matrix(adj)
 
     nb_nodes = features.shape[0]
     ft_size = features.shape[1]
-    nb_classes = labels.shape[1]
+    #nb_classes = labels.shape[1]
 
     adj = normalize_adj(adj)
     adj = (adj + sp.eye(adj.shape[0])).todense()
 
     features = torch.FloatTensor(features[np.newaxis]).to(device)
     adj = torch.FloatTensor(adj[np.newaxis]).to(device)
-    labels = torch.FloatTensor(labels[np.newaxis]).to(device)
+    #labels = torch.FloatTensor(labels[np.newaxis]).to(device)
     idx_train = torch.LongTensor(idx_train).to(device)
     idx_val = torch.LongTensor(idx_val).to(device)
     idx_test = torch.LongTensor(idx_test).to(device)
@@ -99,6 +101,7 @@ if __name__ == '__main__':
 
             subgraphs = generate_rwr_subgraph(dgl_graph, subgraph_size)
             anomaly_subgraphs = sampling_anomaly_subgraph(args.dataset)
+            #anomaly_subgraphs = generate_anomaly_subgraph(nx_graph=nx_graph, label=label, ego_size=3, contam=0.1)
 
             for batch_idx in range(batch_num):
 
@@ -215,6 +218,7 @@ if __name__ == '__main__':
             random.shuffle(all_idx)
             subgraphs = generate_rwr_subgraph(dgl_graph, subgraph_size)
             anomaly_subgraphs = sampling_anomaly_subgraph(args.dataset)
+            #anomaly_subgraphs = generate_anomaly_subgraph(nx_graph=nx_graph, label=label, ego_size=3, contam=0.1)
 
             for batch_idx in range(batch_num):
                 optimiser.zero_grad()

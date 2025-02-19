@@ -216,9 +216,9 @@ def load_mat(dataset, train_rate=0.3, val_rate=0.1):
     adj = sp.csr_matrix(network)
     feat = sp.lil_matrix(attr)
 
-    labels = np.squeeze(np.array(data['Class'],dtype=np.int64) - 1)
-    num_classes = np.max(labels) + 1
-    labels = dense_to_one_hot(labels,num_classes)
+    #labels = np.squeeze(np.array(data['Class'],dtype=np.int64) - 1)
+    #num_classes = np.max(labels) + 1
+    #labels = dense_to_one_hot(labels,num_classes)
 
     ano_labels = np.squeeze(np.array(label))
     if 'str_anomaly_label' in data:
@@ -237,7 +237,7 @@ def load_mat(dataset, train_rate=0.3, val_rate=0.1):
     idx_val = all_idx[num_train : num_train + num_val]
     idx_test = all_idx[num_train + num_val : ]
 
-    return adj, feat, labels, idx_train, idx_val, idx_test, ano_labels, str_ano_labels, attr_ano_labels
+    return adj, feat, label, idx_train, idx_val, idx_test, ano_labels, str_ano_labels, attr_ano_labels
 
 
 def adj_to_dgl_graph(adj):
@@ -269,14 +269,50 @@ def generate_rwr_subgraph(dgl_graph, subgraph_size):
 
 def sampling_anomaly_subgraph(dataset):
     if dataset == 'cora':
-        df = pd.read_csv('dataset/Cora_Ego.csv')
+        df = pd.read_csv('dataset/cora_sample.csv')
     elif dataset == 'citeseer':
         df = pd.read_csv('dataset/Citeseer_Ego.csv')
+        # 0.1
+        #df = pd.read_csv('C:/Users/user/Anaconda3/envs/Anomaly Detection/public dataset/Citeseer_metapath/Length_10/5n/Citeseer_NNNNNNNNNA_5n_random.csv')
+        # 0.2
+        #df = pd.read_csv('C:/Users/user/Anaconda3/envs/Anomaly Detection/public dataset/Citeseer_metapath/Length_5/5n/Citeseer_ANNNN_10percent_5n_random.csv')
+        # 0.3
+        #df = pd.read_csv('C:/Users/user/Anaconda3/envs/Anomaly Detection/public dataset/Citeseer_metapath/Length_10/5n/Citeseer_ANNNNNNNNA_5n_random.csv')
+        # 0.4
+        #df = pd.read_csv('C:/Users/user/Anaconda3/envs/Anomaly Detection/public dataset/Citeseer_metapath/Length_5/5n/Citeseer_ANNNA_10percent_5n_random.csv')
+        #df = pd.read_csv('C:/Users/user/Anaconda3/envs/Anomaly Detection/public dataset/Citeseer_metapath/Length_4/5n/Citeseer_ANNA_10percent_5n_random.csv')
     elif dataset == 'pubmed':
         df = pd.read_csv('dataset/Pubmed_Ego.csv')
     elif dataset == 'ACM':
-        df = pd.read_csv('dataset/ACM_Ego.csv')
+        #df = pd.read_csv('dataset/ACM_Ego.csv')
+        #df = pd.read_csv('dataset/acm_size/ACM_100.csv')
+        #df = pd.read_csv('dataset/acm_size/ACM_500.csv')
+        #df = pd.read_csv('dataset/acm_size/ACM_1000.csv')
+        df = pd.read_csv('dataset/acm_size/ACM_2000.csv')
+        #df = pd.read_csv('dataset/acm_size/ACM_3000.csv')
+        #df = pd.read_csv('dataset/acm_size/ACM_5000.csv')
+        #df = pd.read_csv('dataset/acm_size/ACM_10000.csv')
 
     subv = df.values.tolist()
+
+    return subv
+
+
+def generate_anomaly_subgraph(nx_graph, label, ego_size=3, contam=0.1):
+    ego_nodes = np.where(label == 1)[1] # amazon==1 , cora==0
+    random.shuffle(ego_nodes)
+    ego_nodes = ego_nodes[:int(len(ego_nodes) * contam)]
+    subv = []
+
+    for ego in ego_nodes:
+        hub_ego = nx.ego_graph(nx_graph, ego)
+        ego_list = list(hub_ego.nodes())
+
+        if len(ego_list) == ego_size:
+            subv.append(ego_list)
+        elif len(ego_list) >= ego_size:
+            for i in range(0, len(ego_list), ego_size):
+                if len(ego_list[i:i+ego_size]) >= ego_size:
+                    subv.append(ego_list[i:i+ego_size])
 
     return subv
