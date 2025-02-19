@@ -1,5 +1,5 @@
 # ANOMIX
-A PyTorch implementation of "[ANOMIX: A Simple yet Effective Graph Mixing Approach for GAD]"
+A PyTorch implementation of "[ANOMIX: A Simple yet Effective Graph Mixing for GAD]"
 
 
 # Dependencies
