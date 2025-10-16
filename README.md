@@ -1,5 +1,5 @@
 # ANOMIX
-A PyTorch implementation of "[ANOMIX: A Simple yet Effective Graph Mixing for GAD]"
+A PyTorch implementation of "[Toward Reasoning on the Boundary: A Mixup-based Approach for Graph Anomaly Detection]"
 
 
 # Dependencies
